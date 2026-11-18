@@ -1,4 +1,5 @@
 
+
 package com.example.calculadora
 
 import android.os.Bundle
@@ -35,96 +36,105 @@ import androidx.compose.ui.unit.dp
 import com.example.calculadora.ui.theme.CalculadoraTheme
 import java.text.NumberFormat
 
+// ACTIVIDAD PRINCIPAL: inicia la aplicación Android.
 class MainActivity : ComponentActivity() {
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
 
-        setContent {
-            CalculadoraTheme {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState) // Inicializa la Activity.
+        enableEdgeToEdge() // Permite dibujar detrás de las barras del sistema.
+
+        setContent { // Define la interfaz con Jetpack Compose.
+            CalculadoraTheme { // Aplica el tema de la aplicación.
                 Surface(
-                    modifier = Modifier.fillMaxSize()
+                    modifier = Modifier.fillMaxSize() // Ocupa toda la pantalla.
                 ) {
-                    TipTimeLayout()
+                    TipTimeLayout() // Muestra la pantalla principal.
                 }
             }
         }
     }
 }
 
+// PANTALLA PRINCIPAL: controla el estado y muestra la propina.
 @Composable
 fun TipTimeLayout() {
 
-    var amountInput by remember { mutableStateOf("") }
+    var amountInput by remember { mutableStateOf("") } // Estado: conserva el texto entre recomposiciones.
 
-    val amount = amountInput.toDoubleOrNull() ?: 0.0
-    val tip = calculateTip(amount)
+    val amount = amountInput.toDoubleOrNull() ?: 0.0 // Convierte a Double; si falla, utiliza 0.0.
+    val tip = calculateTip(amount) // Calcula la propina a partir del importe.
 
     Column(
         modifier = Modifier
-            .statusBarsPadding()
-            .padding(horizontal = 40.dp)
-            .verticalScroll(rememberScrollState())
-            .safeDrawingPadding(),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
+            .statusBarsPadding() // Respeta la barra de estado.
+            .padding(horizontal = 40.dp) // Añade márgenes laterales.
+            .verticalScroll(rememberScrollState()) // Permite desplazamiento vertical.
+            .safeDrawingPadding(), // Respeta las zonas seguras de la pantalla.
+        horizontalAlignment = Alignment.CenterHorizontally, // Centra los elementos horizontalmente.
+        verticalArrangement = Arrangement.Center // Centra verticalmente si existe espacio disponible.
     ) {
+
         Text(
-            text = stringResource(R.string.calculate_tip),
+            text = stringResource(R.string.calculate_tip), // Texto guardado en strings.xml.
             modifier = Modifier
-                .padding(bottom = 16.dp, top = 40.dp)
-                .align(Alignment.Start)
+                .padding(bottom = 16.dp, top = 40.dp) // Separación superior e inferior.
+                .align(Alignment.Start) // Alinea el título a la izquierda.
         )
 
         EditNumberField(
-            value = amountInput,
-            onValueChanged = { amountInput = it },
+            value = amountInput, // Envía el estado al campo de texto.
+            onValueChange = { amountInput = it }, // Actualiza el estado con el texto introducido.
             modifier = Modifier
-                .padding(bottom = 32.dp)
-                .fillMaxWidth()
+                .padding(bottom = 32.dp) // Separación inferior.
+                .fillMaxWidth() // Ocupa todo el ancho disponible.
         )
 
         Text(
-            text = stringResource(R.string.tip_amount, tip),
-            style = MaterialTheme.typography.displaySmall
+            text = stringResource(R.string.tip_amount, tip), // Muestra el resultado calculado.
+            style = MaterialTheme.typography.displaySmall // Aplica un estilo de texto grande.
         )
 
-        Spacer(modifier = Modifier.height(150.dp))
+        Spacer(modifier = Modifier.height(150.dp)) // Añade espacio vertical.
     }
 }
 
+// CAMPO DE TEXTO: recibe un valor y comunica sus modificaciones.
 @Composable
 fun EditNumberField(
-    value: String,
-    onValueChanged: (String) -> Unit,
-    modifier: Modifier = Modifier
+    value: String, // Texto que debe mostrar el campo.
+    onValueChange: (String) -> Unit, // Callback: recibe String y no devuelve nada (Unit).
+    modifier: Modifier = Modifier // Modificador opcional con valor predeterminado.
 ) {
     TextField(
-        value = value,
-        singleLine = true,
-        modifier = modifier,
-        onValueChange = onValueChanged,
+        value = value, // Muestra el valor recibido.
+        onValueChange = onValueChange, // Notifica cada cambio de texto.
+        modifier = modifier, // Aplica los modificadores externos.
+        singleLine = true, // Limita el campo a una sola línea.
         label = {
-            Text(stringResource(R.string.bill_amount))
+            Text(stringResource(R.string.bill_amount)) // Etiqueta del campo.
         },
         keyboardOptions = KeyboardOptions(
-            keyboardType = KeyboardType.Number
+            keyboardType = KeyboardType.Number // Solicita el teclado numérico.
         )
     )
 }
 
+// LÓGICA: calcula y formatea la propina.
 private fun calculateTip(
-    amount: Double,
-    tipPercent: Double = 15.0
+    amount: Double, // Importe de la factura.
+    tipPercent: Double = 15.0 // Parámetro opcional: 15 % por defecto.
 ): String {
-    val tip = tipPercent / 100 * amount
-    return NumberFormat.getCurrencyInstance().format(tip)
+
+    val tip = tipPercent / 100 * amount // Calcula el porcentaje.
+
+    return NumberFormat.getCurrencyInstance().format(tip) // Devuelve texto con formato monetario.
 }
 
+// VISTA PREVIA: muestra la interfaz sin ejecutar el emulador.
 @Preview(showBackground = true)
 @Composable
 fun TipTimeLayoutPreview() {
-    CalculadoraTheme {
-        TipTimeLayout()
+    CalculadoraTheme { // Mantiene el tema visual.
+        TipTimeLayout() // Previsualiza la pantalla principal.
     }
 }
